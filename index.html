@@ -1,0 +1,990 @@
+```html
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>WorkLog Blockchain</title>
+
+    <!-- ETHERS -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+
+    <!-- FONT -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+
+            font-family:'Poppins',sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f172a,
+                    #111827,
+                    #1e293b
+                );
+
+            min-height:100vh;
+
+            color:white;
+
+            padding:30px;
+        }
+
+        .container{
+
+            max-width:1400px;
+
+            margin:auto;
+        }
+
+        .header{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            margin-bottom:30px;
+
+            flex-wrap:wrap;
+
+            gap:20px;
+        }
+
+        .logo h1{
+
+            font-size:42px;
+
+            background:
+                linear-gradient(
+                    to right,
+                    #60a5fa,
+                    #a855f7
+                );
+
+            -webkit-background-clip:text;
+
+            -webkit-text-fill-color:transparent;
+        }
+
+        .logo p{
+
+            color:#cbd5e1;
+
+            margin-top:8px;
+        }
+
+        .wallet-box{
+
+            background:rgba(255,255,255,0.08);
+
+            border:1px solid rgba(255,255,255,0.1);
+
+            padding:18px;
+
+            border-radius:18px;
+
+            backdrop-filter:blur(12px);
+
+            min-width:320px;
+        }
+
+        .wallet-address{
+
+            margin-top:12px;
+
+            font-size:14px;
+
+            word-break:break-all;
+
+            color:#93c5fd;
+        }
+
+        .grid{
+
+            display:grid;
+
+            grid-template-columns:420px 1fr;
+
+            gap:25px;
+        }
+
+        .card{
+
+            background:rgba(255,255,255,0.08);
+
+            border:1px solid rgba(255,255,255,0.08);
+
+            border-radius:24px;
+
+            padding:28px;
+
+            backdrop-filter:blur(14px);
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.3);
+        }
+
+        .card h2{
+
+            margin-bottom:20px;
+
+            font-size:25px;
+        }
+
+        input,
+        textarea,
+        select{
+
+            width:100%;
+
+            padding:15px;
+
+            border:none;
+
+            outline:none;
+
+            border-radius:14px;
+
+            margin-top:14px;
+
+            background:#f8fafc;
+
+            font-size:15px;
+        }
+
+        textarea{
+
+            min-height:120px;
+
+            resize:vertical;
+        }
+
+        button{
+
+            border:none;
+
+            cursor:pointer;
+
+            transition:0.3s;
+
+            font-weight:600;
+        }
+
+        .btn-primary{
+
+            width:100%;
+
+            margin-top:20px;
+
+            padding:15px;
+
+            border-radius:14px;
+
+            background:
+                linear-gradient(
+                    to right,
+                    #2563eb,
+                    #7c3aed
+                );
+
+            color:white;
+
+            font-size:16px;
+        }
+
+        .btn-primary:hover{
+
+            transform:translateY(-2px);
+
+            opacity:0.95;
+        }
+
+        .btn-secondary{
+
+            padding:13px 18px;
+
+            border-radius:12px;
+
+            background:#0f172a;
+
+            color:white;
+
+            border:1px solid rgba(255,255,255,0.08);
+
+            margin-right:10px;
+        }
+
+        .btn-secondary:hover{
+
+            background:#1e293b;
+        }
+
+        .status{
+
+            margin-top:15px;
+
+            font-size:16px;
+
+            font-weight:600;
+        }
+
+        .task-image{
+            margin-top:18px;
+            border-radius:18px;
+            overflow:hidden;
+            border:1px solid rgba(255,255,255,0.12);
+        }
+
+        .task-image img{
+            width:100%;
+            display:block;
+            object-fit:cover;
+            max-height:280px;
+        }
+
+        .success{
+
+            color:#4ade80;
+        }
+
+        .error{
+
+            color:#f87171;
+        }
+
+        .block-list{
+
+            margin-top:25px;
+
+            max-height:700px;
+
+            overflow:auto;
+
+            padding-right:10px;
+        }
+
+        .block{
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(59,130,246,0.15),
+                    rgba(168,85,247,0.15)
+                );
+
+            border:1px solid rgba(255,255,255,0.08);
+
+            border-radius:22px;
+
+            padding:22px;
+
+            margin-bottom:22px;
+        }
+
+        .block-header{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            margin-bottom:18px;
+        }
+
+        .badge{
+
+            padding:7px 14px;
+
+            border-radius:999px;
+
+            font-size:13px;
+
+            font-weight:600;
+        }
+
+        .pending{
+
+            background:#f59e0b;
+        }
+
+        .progress{
+
+            background:#3b82f6;
+        }
+
+        .completed{
+
+            background:#22c55e;
+        }
+
+        .info{
+
+            line-height:1.8;
+
+            color:#e2e8f0;
+        }
+
+        .hash{
+
+            margin-top:14px;
+
+            font-size:12px;
+
+            word-break:break-all;
+
+            background:rgba(0,0,0,0.25);
+
+            padding:12px;
+
+            border-radius:12px;
+
+            color:#cbd5e1;
+        }
+
+        @media(max-width:1000px){
+
+            .grid{
+
+                grid-template-columns:1fr;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="logo">
+
+            <h1>WorkLog Blockchain</h1>
+
+            <p>
+                Hệ thống nhật ký công việc bằng Blockchain
+            </p>
+
+        </div>
+
+        <div class="wallet-box">
+
+            <button
+                class="btn-secondary"
+                onclick="connectWallet()"
+            >
+                Kết nối MetaMask
+            </button>
+
+            <div
+                id="wallet"
+                class="wallet-address"
+            >
+                Chưa kết nối ví
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="grid">
+
+        <!-- LEFT -->
+
+        <div class="card">
+
+            <h2>Thêm công việc</h2>
+
+            <input
+                type="text"
+                id="taskId"
+                placeholder="Nhập Task ID"
+            >
+
+            <textarea
+                id="description"
+                placeholder="Mô tả công việc..."
+            ></textarea>
+
+            <select id="status">
+
+                <option value="Pending">
+                    Pending
+                </option>
+
+                <option value="In Progress">
+                    In Progress
+                </option>
+
+                <option value="Completed">
+                    Completed
+                </option>
+
+            </select>
+
+            <input
+                type="file"
+                id="taskImage"
+                accept="image/*"
+            >
+
+            <button
+                class="btn-primary"
+                onclick="addTask()"
+            >
+                Lưu công việc
+            </button>
+
+        </div>
+
+        <!-- RIGHT -->
+
+        <div class="card">
+
+            <h2>Blockchain Data</h2>
+
+            <button
+                class="btn-secondary"
+                onclick="loadBlockchain()"
+            >
+                Tải Blockchain
+            </button>
+
+            <button
+                class="btn-secondary"
+                onclick="downloadDatabase()"
+                style="margin-left:0;"
+            >
+                Tải DB
+            </button>
+
+            <div
+                id="blockchainData"
+                class="block-list"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let provider;
+
+let signer;
+
+let contract;
+
+const contractAddress =
+"0x87BA703f25Fa9C75C7410f3a1D25272CFe0Bc37F";
+
+const serverUrl = 'http://127.0.0.1:3000';
+
+const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "taskId",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "status",
+				"type": "string"
+			}
+		],
+		"name": "addTask",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "taskId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "status",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			}
+		],
+		"name": "TaskAdded",
+		"type": "event"
+	},
+	{
+		"stateMutability": "payable",
+		"type": "fallback"
+	},
+	{
+		"stateMutability": "payable",
+		"type": "receive"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "getTask",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "taskCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "taskExists",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+
+// CONNECT METAMASK
+
+async function connectWallet(){
+
+    try{
+
+        if(typeof window.ethereum === "undefined"){
+
+            alert("Hãy cài MetaMask");
+
+            return;
+        }
+
+        await window.ethereum.request({
+
+            method:"eth_requestAccounts"
+
+        });
+
+        provider =
+            new ethers.providers.Web3Provider(
+                window.ethereum
+            );
+
+        signer =
+            provider.getSigner();
+
+        const network = await provider.getNetwork();
+
+        const contractCode =
+            await provider.getCode(contractAddress);
+
+        if(contractCode === "0x"){
+            alert(
+                "Không tìm thấy contract trên mạng hiện tại. " +
+                "Hãy chuyển MetaMask sang mạng đúng."
+            );
+            document.getElementById("wallet").innerHTML =
+                `${await signer.getAddress()} (${network.name})`;
+            return;
+        }
+
+        contract =
+            new ethers.Contract(
+                contractAddress,
+                contractABI,
+                signer
+            );
+
+        const address =
+            await signer.getAddress();
+
+        document.getElementById("wallet")
+        .innerHTML = `${address} (${network.name})`;
+
+        alert("Kết nối MetaMask thành công");
+
+        loadBlockchain();
+
+    }catch(err){
+
+        console.log(err);
+
+        alert("Lỗi kết nối MetaMask");
+    }
+}
+
+// ADD TASK
+
+async function addTask(){
+
+    if(!contract){
+
+        alert("Hãy kết nối MetaMask");
+
+        return;
+    }
+
+    const taskId =
+        document.getElementById("taskId").value;
+
+    const status =
+        document.getElementById("status").value;
+
+    const description =
+        document.getElementById("description").value;
+
+    const taskImage =
+        document.getElementById("taskImage").files[0];
+
+    if(taskId.trim() === ""){
+
+        alert("Nhập Task ID");
+
+        return;
+    }
+
+    try{
+
+        // 1) Ước lượng gas an toàn từ provider
+        let gasEstimate;
+        try{
+            gasEstimate = await contract.estimateGas.addTask(taskId, status);
+        }catch(e){
+            console.warn('estimateGas failed, falling back to default', e);
+            gasEstimate = ethers.BigNumber.from('100000');
+        }
+
+        // 2) Thêm đệm 20% cho gasLimit
+        const gasLimit = gasEstimate.mul(120).div(100);
+
+        const tx = await contract.addTask(taskId, status, { gasLimit });
+
+        console.log('tx sent', tx);
+        alert('Đang xử lý giao dịch...');
+
+        const receipt = await tx.wait();
+
+        console.log('tx receipt', receipt);
+
+        let uploadError = null;
+
+        try {
+            const uploadData = new FormData();
+            uploadData.append('taskId', taskId);
+            uploadData.append('status', status);
+            uploadData.append('description', description);
+            if (taskImage) {
+                uploadData.append('file', taskImage);
+            }
+
+            const uploadResponse = await fetch(`${serverUrl}/upload`, {
+                method: 'POST',
+                body: uploadData,
+            });
+
+            if (!uploadResponse.ok) {
+                const errorJson = await uploadResponse.json().catch(() => null);
+                const errorMessage = errorJson?.error || uploadResponse.statusText;
+                uploadError = new Error(errorMessage);
+            }
+        } catch (uploadErr) {
+            uploadError = uploadErr;
+        }
+
+        if (uploadError) {
+            console.warn('Upload lỗi:', uploadError);
+            alert('Giao dịch blockchain thành công nhưng upload ảnh thất bại: ' + uploadError.message);
+        } else {
+            alert('Lưu công việc và ảnh thành công');
+        }
+
+        document.getElementById('taskId').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('taskImage').value = '';
+
+        loadBlockchain();
+
+    }catch(err){
+
+        console.error('Giao dịch lỗi', err);
+
+        let reason = err?.reason || err?.message || '';
+        if(!reason && err?.error && err.error.message) reason = err.error.message;
+        if(!reason && err?.data && err.data.message) reason = err.data.message;
+
+        alert('Lỗi giao dịch:\n' + reason);
+    }
+}
+
+
+
+// LOAD BLOCKCHAIN
+
+async function loadBlockchain(){
+
+    if(!contract){
+
+        return;
+    }
+
+    try{
+
+        const count =
+            await contract.taskCount();
+        let serverTasks = [];
+        try {
+            const serverTasksResponse = await fetch(`${serverUrl}/tasks`);
+            serverTasks = serverTasksResponse.ok ? await serverTasksResponse.json() : [];
+        } catch (serverFetchError) {
+            console.warn('Không thể lấy task từ server:', serverFetchError);
+        }
+        const serverTaskMap = {};
+        serverTasks.forEach(row => {
+            if (!row.taskId) return;
+            if (!serverTaskMap[row.taskId] || row.timestamp > serverTaskMap[row.taskId].timestamp) {
+                serverTaskMap[row.taskId] = row;
+            }
+        });
+        let html = "";
+
+        for(
+            let i = Number(count);
+            i >= 1;
+            i--
+        ){
+
+            const task =
+                await contract.getTask(i);
+
+            const date =
+                new Date(
+                    Number(task[3]) * 1000
+                );
+
+            let statusClass = "pending";
+
+            if(task[2] === "In Progress"){
+
+                statusClass = "progress";
+            }
+
+            if(task[2] === "Completed"){
+
+                statusClass = "completed";
+            }
+
+            html += `
+
+            <div class="block">
+
+                <div class="block-header">
+
+                    <h3>
+                        #${task[0]}
+                    </h3>
+
+                    <div class="badge ${statusClass}">
+                        ${task[2]}
+                    </div>
+
+                </div>
+
+                <div class="info">
+
+                    <p>
+                        <b>Task ID:</b>
+                        ${task[1]}
+                    </p>
+
+                    <p>
+                        <b>Người cập nhật:</b>
+                        ${task[4]}
+                    </p>
+
+                    <p>
+                        <b>Thời gian:</b>
+                        ${date.toLocaleString()}
+                    </p>
+
+                    ${serverTaskMap[task[1]]?.description ? `
+                    <p>
+                        <b>Mô tả:</b>
+                        ${serverTaskMap[task[1]].description}
+                    </p>
+                    ` : ''}
+
+                </div>
+
+                ${serverTaskMap[task[1]]?.imageUrl ? `
+                <div class="task-image">
+                    <img src="${serverUrl}${serverTaskMap[task[1]].imageUrl}" alt="Ảnh cập nhật">
+                </div>
+                ` : ''}
+
+                <div class="hash">
+
+                    <b>Hash:</b><br>
+
+                    ${task[5]}
+
+                </div>
+
+            </div>
+
+            `;
+        }
+
+        if (!html.trim() && Object.keys(serverTaskMap).length) {
+            html = Object.values(serverTaskMap).map(row => `
+                <div class="block">
+                    <div class="block-header">
+                        <h3>#${row.taskId}</h3>
+                        <div class="badge ${row.status === 'Completed' ? 'completed' : row.status === 'In Progress' ? 'progress' : 'pending'}">
+                            ${row.status || 'Pending'}
+                        </div>
+                    </div>
+                    <div class="info">
+                        <p><b>Task ID:</b> ${row.taskId}</p>
+                        ${row.description ? `<p><b>Mô tả:</b> ${row.description}</p>` : ''}
+                        <p><b>Thời gian:</b> ${new Date(row.timestamp).toLocaleString()}</p>
+                    </div>
+                    ${row.imageUrl ? `<div class="task-image"><img src="${serverUrl}${row.imageUrl}" alt="Ảnh cập nhật"></div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        document.getElementById(
+            "blockchainData"
+        ).innerHTML = html;
+
+    }catch(err){
+
+        console.log(err);
+    }
+}
+
+// Download database from server
+function downloadDatabase(){
+    const link = document.createElement('a');
+    link.href = 'http://127.0.0.1:3000/download-db';
+    link.download = 'worklog-tasks.db';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+</script>
+
+</body>
+</html>
+```
