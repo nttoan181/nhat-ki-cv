@@ -322,3 +322,6 @@ Blockchain Work Log System
 # 📜 License
 
 This project is developed for educational, research and Blockchain learning purposes.
+## Poster
+<img width="1500" height="2167" alt="nguyễn-tất-toàn" src="https://github.com/user-attachments/assets/02978713-935f-49e6-a0ce-2bebf1558614" />
+
